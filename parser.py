@@ -10,12 +10,29 @@ HEADERS = {
 
 
 def get_html(url, params=None):
-    r = requests.get(url, params)
+    r = requests.get(url, headers=HEADERS, params=params)
     return r
 
 
-print(get_html(URL, HEADERS).status_code)
+def get_content(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    items = soup.find_all('div', class_='schema-product')
+    for item in items:
+        print()
+    notebooks = []
+    for item in items:
+        notebooks.append({
+            'title': item.find('div', class_='schema-product__title').get_text()
+        })
+    print(notebooks)
 
 
 def parse():
-    pass
+    html = get_html(URL)
+    if html.status_code == 200:
+        get_content(html.text)
+    else:
+        print(f'Возникла какая-то ошибка.\n {html.status_code}')
+
+
+parse()
